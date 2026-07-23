@@ -53,6 +53,7 @@ const App = () => {
     setInitialGrid(puzzle.map(row => [...row]));
     setGrid(puzzle.map(row => [...row]));
     setErrors([]);
+    setSelectedCell(null);
   };
 
   useEffect(() => {
