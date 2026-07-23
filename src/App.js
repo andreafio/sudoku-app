@@ -14,7 +14,6 @@ const App = () => {
   const [selectedCell, setSelectedCell] = useState(null);
   const [errors, setErrors] = useState([]);
   const [difficulty, setDifficulty] = useState('medio');
-  const [boardKey, setBoardKey] = useState(0);
   const [lastFilled, setLastFilled] = useState(null);
 
   const isValid = (board, row, col, num) => {
@@ -66,7 +65,6 @@ const App = () => {
     setErrors([]);
     setSelectedCell(null);
     setLastFilled(null);
-    setBoardKey(k => k + 1);
   };
 
   useEffect(() => {
@@ -137,7 +135,7 @@ const App = () => {
         ))}
       </div>
 
-      <div className="sudoku-board" key={boardKey}>
+      <div className="sudoku-board">
         {grid.map((row, rowIndex) => (
           <div key={rowIndex} className="row">
             {row.map((cell, colIndex) => {
@@ -149,8 +147,7 @@ const App = () => {
                 <div
                   key={colIndex}
                   data-value={cell !== 0 ? cell : undefined}
-                  className={`cell reveal ${isSelected ? 'selected' : ''} ${isFixed ? 'fixed' : ''} ${isError ? 'error' : ''} ${isPopping ? 'pop' : ''}`}
-                  style={{ animationDelay: `${(rowIndex * 9 + colIndex) * 6}ms` }}
+                  className={`cell ${isSelected ? 'selected' : ''} ${isFixed ? 'fixed' : ''} ${isError ? 'error' : ''} ${isPopping ? 'pop' : ''}`}
                   onClick={() => handleCellClick(rowIndex, colIndex)}
                   onAnimationEnd={(e) => {
                     if (e.animationName === 'popIn') setLastFilled(null);

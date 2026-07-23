@@ -1,13 +1,13 @@
 :root {
-  --d1: #f43f5e;
-  --d2: #fb923c;
-  --d3: #f59e0b;
-  --d4: #84cc16;
-  --d5: #10b981;
-  --d6: #06b6d4;
-  --d7: #3b82f6;
-  --d8: #8b5cf6;
-  --d9: #ec4899;
+  --d1: #fb7185;
+  --d2: #fdba74;
+  --d3: #fcd34d;
+  --d4: #a3e635;
+  --d5: #6ee7b7;
+  --d6: #67e8f9;
+  --d7: #93c5fd;
+  --d8: #c4b5fd;
+  --d9: #f9a8d4;
 
   --fixed-color: #1e293b;
   --board-line: #1e293b;
@@ -116,15 +116,6 @@ body {
   transition: background-color 0.15s ease, transform 0.1s ease;
 }
 
-.cell.reveal {
-  animation: revealIn 0.35s both ease-out;
-}
-
-@keyframes revealIn {
-  0% { opacity: 0; transform: scale(0.4) rotate(-8deg); }
-  100% { opacity: 1; transform: scale(1) rotate(0deg); }
-}
-
 .cell:hover {
   background-color: #f1f5f9;
 }
@@ -154,7 +145,7 @@ body {
 
 .cell.selected {
   background-color: #ede9fe;
-  animation: revealIn 0.35s both ease-out, selectedPulse 1.6s ease-in-out infinite;
+  animation: selectedPulse 1.6s ease-in-out infinite;
 }
 
 @keyframes selectedPulse {
@@ -188,7 +179,7 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   body { animation: none; }
-  .cell.reveal, .cell.selected, .cell.pop, .cell.error { animation: none; }
+  .cell.selected, .cell.pop, .cell.error { animation: none; }
 }
 
 .number-pad {
@@ -202,11 +193,11 @@ body {
   padding: 10px 0;
   font-size: 1.05rem;
   font-weight: 700;
-  color: #fff;
+  color: #1e293b;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
   transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
