@@ -7,14 +7,14 @@ Ogni task vive in `tasks/` come file markdown con obiettivo, checklist e stato.
 
 | ID | Task | Stato |
 |----|------|-------|
-| [T-001](tasks/T-001-vault.md) | Creare il vault | todo |
-| [T-002](tasks/T-002-estrarre-sudoku.md) | Estrarre il Sudoku in modulo | todo |
-| [T-003](tasks/T-003-tema-condiviso.md) | Tema condiviso | todo |
-| [T-004](tasks/T-004-home-gameshell.md) | Home + GameShell | todo |
-| [T-005](tasks/T-005-2048.md) | Gioco 2048 | todo |
-| [T-006](tasks/T-006-memory.md) | Gioco Memory | todo |
-| [T-007](tasks/T-007-tris.md) | Gioco Tris | todo |
-| [T-008](tasks/T-008-verifica.md) | Verifica e rifiniture | todo |
+| [T-001](tasks/T-001-vault.md) | Creare il vault | done |
+| [T-002](tasks/T-002-estrarre-sudoku.md) | Estrarre il Sudoku in modulo | done |
+| [T-003](tasks/T-003-tema-condiviso.md) | Tema condiviso | done |
+| [T-004](tasks/T-004-home-gameshell.md) | Home + GameShell | done |
+| [T-005](tasks/T-005-2048.md) | Gioco 2048 | done |
+| [T-006](tasks/T-006-memory.md) | Gioco Memory | done |
+| [T-007](tasks/T-007-tris.md) | Gioco Tris | done |
+| [T-008](tasks/T-008-verifica.md) | Verifica e rifiniture | done |
 
 Stati possibili: `todo` → `in-progress` → `done`.
 
