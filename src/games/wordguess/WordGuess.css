@@ -32,6 +32,7 @@
 }
 
 .wg-boards {
+  position: relative;
   display: flex;
   gap: 24px;
   align-items: flex-start;
@@ -111,25 +112,33 @@
   font-size: 0.85rem;
   font-weight: 700;
   color: #1e293b;
+  text-align: center;
   background: rgba(255, 255, 255, 0.9);
-  border: none;
   border-radius: 6px;
-  cursor: pointer;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-  transition: transform 0.1s ease, background-color 0.12s ease, color 0.12s ease;
+  transition: background-color 0.12s ease, color 0.12s ease;
 }
-
-.wg-key-wide {
-  min-width: min(12vw, 56px);
-  font-size: 0.65rem;
-}
-
-.wg-key:hover { transform: translateY(-2px); }
-.wg-key:active { transform: scale(0.92); }
 
 .wg-key.correct { background: var(--diff-facile); color: #fff; }
 .wg-key.present { background: var(--d2); color: #fff; }
 .wg-key.absent { background: #94a3b8; color: #fff; }
+
+.wg-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: none;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.wg-hint {
+  margin: 10px 0 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+}
 
 @media (prefers-reduced-motion: reduce) {
   .wg-row.shake { animation: none; }

@@ -181,6 +181,7 @@ const Crossword = () => {
   const [winner, setWinner] = useState(null);
   const [aiProgress, setAiProgress] = useState(0);
   const aiTimerRef = useRef(null);
+  const inputRef = useRef(null);
 
   const diffConf = DIFFICULTIES.find(d => d.key === difficulty);
 
@@ -252,6 +253,7 @@ const Crossword = () => {
       const dir = (prev && entry[prev.dir]) ? prev.dir : (entry.across ? 'across' : 'down');
       return { row, col, dir };
     });
+    inputRef.current?.focus();
   };
 
   const moveSelection = (row, col, dir) => {
@@ -268,33 +270,39 @@ const Crossword = () => {
     });
   };
 
-  useEffect(() => {
+  // Letters arrive through the hidden input's onChange (works with mobile virtual
+  // keyboards, which don't reliably fire keydown for character keys); Backspace and
+  // arrow keys are handled on keydown since they aren't text insertion.
+  const handleInputChange = (e) => {
+    const val = e.target.value;
+    e.target.value = '';
     if (!selected || winner) return;
-    const onKey = (e) => {
-      const { row, col, dir } = selected;
-      if (/^[a-zA-Z]$/.test(e.key)) {
-        setLetter(row, col, e.key.toUpperCase());
-        const nr = dir === 'down' ? row + 1 : row;
-        const nc = dir === 'across' ? col + 1 : col;
-        if (nr < puzzle.rows && nc < puzzle.cols && puzzle.solution[nr][nc]) setSelected({ row: nr, col: nc, dir });
-      } else if (e.key === 'Backspace') {
-        e.preventDefault();
-        if (userGrid[row][col]) {
-          setLetter(row, col, '');
-        } else {
-          const pr = dir === 'down' ? row - 1 : row;
-          const pc = dir === 'across' ? col - 1 : col;
-          if (pr >= 0 && pc >= 0 && puzzle.solution[pr][pc]) { setLetter(pr, pc, ''); setSelected({ row: pr, col: pc, dir }); }
-        }
-      } else if (e.key === 'ArrowRight') moveSelection(row, col + 1, 'across');
-      else if (e.key === 'ArrowLeft') moveSelection(row, col - 1, 'across');
-      else if (e.key === 'ArrowDown') moveSelection(row + 1, col, 'down');
-      else if (e.key === 'ArrowUp') moveSelection(row - 1, col, 'down');
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-    // eslint-disable-next-line
-  }, [selected, winner, puzzle, userGrid]);
+    const letter = val.slice(-1).toUpperCase();
+    if (!/^[A-Z]$/.test(letter)) return;
+    const { row, col, dir } = selected;
+    setLetter(row, col, letter);
+    const nr = dir === 'down' ? row + 1 : row;
+    const nc = dir === 'across' ? col + 1 : col;
+    if (nr < puzzle.rows && nc < puzzle.cols && puzzle.solution[nr][nc]) setSelected({ row: nr, col: nc, dir });
+  };
+
+  const handleInputKeyDown = (e) => {
+    if (!selected || winner) return;
+    const { row, col, dir } = selected;
+    if (e.key === 'Backspace') {
+      e.preventDefault();
+      if (userGrid[row][col]) {
+        setLetter(row, col, '');
+      } else {
+        const pr = dir === 'down' ? row - 1 : row;
+        const pc = dir === 'across' ? col - 1 : col;
+        if (pr >= 0 && pc >= 0 && puzzle.solution[pr][pc]) { setLetter(pr, pc, ''); setSelected({ row: pr, col: pc, dir }); }
+      }
+    } else if (e.key === 'ArrowRight') moveSelection(row, col + 1, 'across');
+    else if (e.key === 'ArrowLeft') moveSelection(row, col - 1, 'across');
+    else if (e.key === 'ArrowDown') moveSelection(row + 1, col, 'down');
+    else if (e.key === 'ArrowUp') moveSelection(row - 1, col, 'down');
+  };
 
   useEffect(() => {
     if (winner) return;
@@ -363,6 +371,19 @@ const Crossword = () => {
 
       <div className="xw-layout">
         <div className="xw-board">
+          <input
+            ref={inputRef}
+            className="xw-input"
+            type="text"
+            inputMode="text"
+            autoCapitalize="characters"
+            autoCorrect="off"
+            autoComplete="off"
+            spellCheck="false"
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            aria-label="Scrivi la lettera"
+          />
           {puzzle.solution.map((row, r) => (
             <div key={r} className="xw-row">
               {row.map((letterSolution, c) => {
@@ -397,7 +418,7 @@ const Crossword = () => {
               <button
                 key={`a-${p.number}`}
                 className={`xw-clue ${activeWord === p ? 'active' : ''}`}
-                onClick={() => setSelected({ row: p.row, col: p.col, dir: 'across' })}
+                onClick={() => { setSelected({ row: p.row, col: p.col, dir: 'across' }); inputRef.current?.focus(); }}
               >
                 <strong>{p.number}.</strong> {p.clue}
               </button>
@@ -409,7 +430,7 @@ const Crossword = () => {
               <button
                 key={`d-${p.number}`}
                 className={`xw-clue ${activeWord === p ? 'active' : ''}`}
-                onClick={() => setSelected({ row: p.row, col: p.col, dir: 'down' })}
+                onClick={() => { setSelected({ row: p.row, col: p.col, dir: 'down' }); inputRef.current?.focus(); }}
               >
                 <strong>{p.number}.</strong> {p.clue}
               </button>

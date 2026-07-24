@@ -26,7 +26,7 @@ const MAX_ATTEMPTS = 6;
 const KEYBOARD_ROWS = [
   ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
   ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
-  ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACK'],
+  ['Z', 'X', 'C', 'V', 'B', 'N', 'M'],
 ];
 
 const randomWord = (length) => {
@@ -77,6 +77,7 @@ const WordGuess = () => {
   const aiCandidatesRef = useRef([]);
   const aiTimerRef = useRef(null);
   const winnerRef = useRef(null);
+  const inputRef = useRef(null);
 
   useEffect(() => { winnerRef.current = winner; }, [winner]);
 
@@ -123,10 +124,12 @@ const WordGuess = () => {
     setAiGuesses([]);
     aiCandidatesRef.current = WORDS_BY_LENGTH[conf.length];
     if ((nextMode || mode) === 'sfida') startAiTimer(newTarget);
+    inputRef.current?.focus();
     // eslint-disable-next-line
   }, [mode, diffConf]);
 
   useEffect(() => () => stopAiTimer(), []);
+  useEffect(() => { inputRef.current?.focus(); }, []);
 
   const submitGuess = useCallback(() => {
     if (playerDone || current.length !== wordLength) {
@@ -143,23 +146,23 @@ const WordGuess = () => {
     setCurrent('');
   }, [current, wordLength, target, playerDone]);
 
-  const pressKey = useCallback((key) => {
+  // Letters arrive through the real input's onChange (works with mobile virtual
+  // keyboards, which don't reliably fire keydown for character keys); Enter and
+  // Backspace are handled on keydown since they aren't text insertion.
+  const handleInputChange = (e) => {
+    const val = e.target.value;
+    e.target.value = '';
     if (playerDone) return;
-    if (key === 'ENTER') { submitGuess(); return; }
-    if (key === 'BACK') { setCurrent(c => c.slice(0, -1)); return; }
-    setCurrent(c => (c.length < wordLength ? c + key : c));
-  }, [playerDone, wordLength, submitGuess]);
+    const letter = val.slice(-1).toUpperCase();
+    if (!/^[A-Z]$/.test(letter)) return;
+    setCurrent(c => (c.length < wordLength ? c + letter : c));
+  };
 
-  useEffect(() => {
-    const onKey = (e) => {
-      const k = e.key.toUpperCase();
-      if (k === 'ENTER') pressKey('ENTER');
-      else if (k === 'BACKSPACE') pressKey('BACK');
-      else if (/^[A-Z]$/.test(k)) pressKey(k);
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [pressKey]);
+  const handleInputKeyDown = (e) => {
+    if (playerDone) return;
+    if (e.key === 'Enter') submitGuess();
+    else if (e.key === 'Backspace') setCurrent(c => c.slice(0, -1));
+  };
 
   useEffect(() => {
     if (mode !== 'sfida' || winner) return;
@@ -221,7 +224,20 @@ const WordGuess = () => {
         </div>
       )}
 
-      <div className="wg-boards">
+      <div className="wg-boards" onClick={() => inputRef.current?.focus()}>
+        <input
+          ref={inputRef}
+          className="wg-input"
+          type="text"
+          inputMode="text"
+          autoCapitalize="characters"
+          autoCorrect="off"
+          autoComplete="off"
+          spellCheck="false"
+          onChange={handleInputChange}
+          onKeyDown={handleInputKeyDown}
+          aria-label="Scrivi il tentativo"
+        />
         <div className="wg-board">
           {Array.from({ length: rowsToShow }).map((_, r) => {
             const rowData = guesses[r];
@@ -264,21 +280,16 @@ const WordGuess = () => {
         )}
       </div>
 
-      <div className="wg-keyboard">
+      <div className="wg-keyboard" aria-hidden="true">
         {KEYBOARD_ROWS.map((row, r) => (
           <div key={r} className="wg-key-row">
             {row.map(key => (
-              <button
-                key={key}
-                className={`wg-key ${key.length > 1 ? 'wg-key-wide' : ''} ${keyStatus[key] || ''}`}
-                onClick={() => pressKey(key)}
-              >
-                {key === 'BACK' ? '⌫' : key === 'ENTER' ? 'INVIO' : key}
-              </button>
+              <span key={key} className={`wg-key ${keyStatus[key] || ''}`}>{key}</span>
             ))}
           </div>
         ))}
       </div>
+      <p className="wg-hint">Scrivi con la tastiera · INVIO per confermare</p>
 
       <button className="reset-btn" onClick={() => newGame(difficulty, mode)}>Nuova Parola</button>
     </div>

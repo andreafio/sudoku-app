@@ -16,12 +16,25 @@
 }
 
 .xw-board {
+  position: relative;
   background: #fff;
   border-radius: 12px;
   padding: 8px;
   box-shadow: 0 20px 45px rgba(0, 0, 0, 0.3);
   border: 3px solid var(--board-line);
   display: inline-block;
+}
+
+.xw-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: none;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .xw-row {
