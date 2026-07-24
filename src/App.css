@@ -119,6 +119,8 @@ body {
 .card-g2048 { border-bottom: 5px solid var(--d2); }
 .card-memory { border-bottom: 5px solid var(--d5); }
 .card-tris { border-bottom: 5px solid var(--d9); }
+.card-wordguess { border-bottom: 5px solid var(--d1); }
+.card-crossword { border-bottom: 5px solid var(--d8); }
 
 /* ---- GameShell ---- */
 
