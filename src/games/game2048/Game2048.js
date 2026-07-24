@@ -97,6 +97,7 @@ const Game2048 = () => {
 
   const winnerRef = useRef(null);
   const aiOverRef = useRef(false);
+  const touchStartRef = useRef(null);
   useEffect(() => { winnerRef.current = winner; }, [winner]);
   useEffect(() => { aiOverRef.current = ai.over; }, [ai.over]);
 
@@ -168,6 +169,24 @@ const Game2048 = () => {
     return () => window.removeEventListener('keydown', onKey);
   }, [doMove]);
 
+  const handleTouchStart = (e) => {
+    const t = e.touches[0];
+    touchStartRef.current = { x: t.clientX, y: t.clientY };
+  };
+
+  const handleTouchEnd = (e) => {
+    if (!touchStartRef.current) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - touchStartRef.current.x;
+    const dy = t.clientY - touchStartRef.current.y;
+    touchStartRef.current = null;
+    const absX = Math.abs(dx);
+    const absY = Math.abs(dy);
+    if (Math.max(absX, absY) < 24) return;
+    if (absX > absY) doMove(dx > 0 ? 'right' : 'left');
+    else doMove(dy > 0 ? 'down' : 'up');
+  };
+
   const renderBoard = (board, extraClass) => (
     <div className={`g2048-board ${extraClass || ''}`} style={{ '--cols': board.length }}>
       {board.map((row, r) => (
@@ -220,7 +239,9 @@ const Game2048 = () => {
       </div>
 
       <div className={mode === 'sfida' ? 'g2048-duel' : ''}>
-        {renderBoard(player.board)}
+        <div className="g2048-swipe-zone" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+          {renderBoard(player.board)}
+        </div>
         {mode === 'sfida' && renderBoard(ai.board, 'g2048-board-mini')}
       </div>
 
@@ -234,7 +255,7 @@ const Game2048 = () => {
       </div>
 
       <button className="reset-btn" onClick={() => startGame(difficulty, mode)}>Nuova Partita</button>
-      <p className="g2048-hint">Usa le frecce della tastiera o i pulsanti · griglia {size}x{size}</p>
+      <p className="g2048-hint">Scorri sulla griglia, o usa le frecce · griglia {size}x{size}</p>
     </div>
   );
 };

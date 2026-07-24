@@ -45,6 +45,10 @@
 .g2048-won { background: var(--diff-facile); }
 .g2048-lost { background: var(--diff-esperto); }
 
+.g2048-swipe-zone {
+  touch-action: none;
+}
+
 .g2048-board {
   background: #fff;
   border-radius: 16px;
