@@ -15,12 +15,14 @@ Ogni task vive in `tasks/` come file markdown con obiettivo, checklist e stato.
 | [T-006](tasks/T-006-memory.md) | Gioco Memory | done |
 | [T-007](tasks/T-007-tris.md) | Gioco Tris | done |
 | [T-008](tasks/T-008-verifica.md) | Verifica e rifiniture | done |
+| [T-009](tasks/T-009-difficolta-tutti.md) | Difficoltà per tutti i giochi | done |
+| [T-010](tasks/T-010-sfida-ai.md) | Modalità Sfida contro il Computer | done |
 
 Stati possibili: `todo` → `in-progress` → `done`.
 
 ## Ordine di esecuzione
 
-T-001 → T-002/T-003 → T-004 → T-005/T-006/T-007 (indipendenti tra loro) → T-008
+T-001 → T-002/T-003 → T-004 → T-005/T-006/T-007 (indipendenti tra loro) → T-008 → T-009 → T-010
 
 ## Riferimenti
 
