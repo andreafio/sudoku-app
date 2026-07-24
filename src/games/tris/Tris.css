@@ -4,36 +4,6 @@
   align-items: center;
 }
 
-.tris-modes {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 14px;
-}
-
-.tris-mode {
-  border: none;
-  background: rgba(255, 255, 255, 0.85);
-  padding: 8px 16px;
-  border-radius: 999px;
-  font-family: inherit;
-  font-weight: 700;
-  font-size: 0.85rem;
-  color: var(--diff-medio);
-  box-shadow: inset 0 0 0 2px var(--diff-medio);
-  cursor: pointer;
-  transition: transform 0.12s ease, background-color 0.12s ease, color 0.12s ease;
-}
-
-.tris-mode:hover {
-  transform: translateY(-2px);
-}
-
-.tris-mode.active {
-  background: var(--diff-medio);
-  color: #fff;
-  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.55);
-}
-
 .tris-status {
   min-height: 30px;
   margin-bottom: 14px;

@@ -1,20 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './Sudoku.css';
 
 const DIFFICULTIES = [
-  { key: 'facile', label: 'Facile', removed: 34 },
-  { key: 'medio', label: 'Medio', removed: 45 },
-  { key: 'difficile', label: 'Difficile', removed: 52 },
-  { key: 'esperto', label: 'Esperto', removed: 58 },
+  { key: 'facile', label: 'Facile', removed: 34, aiIntervalMs: 700 },
+  { key: 'medio', label: 'Medio', removed: 45, aiIntervalMs: 550 },
+  { key: 'difficile', label: 'Difficile', removed: 52, aiIntervalMs: 420 },
+  { key: 'esperto', label: 'Esperto', removed: 58, aiIntervalMs: 300 },
 ];
 
 const Sudoku = () => {
   const [grid, setGrid] = useState([]);
   const [initialGrid, setInitialGrid] = useState([]);
+  const [solutionGrid, setSolutionGrid] = useState([]);
   const [selectedCell, setSelectedCell] = useState(null);
   const [errors, setErrors] = useState([]);
   const [difficulty, setDifficulty] = useState('medio');
   const [lastFilled, setLastFilled] = useState(null);
+  const [mode, setMode] = useState('libera');
+  const [aiProgress, setAiProgress] = useState(0);
+  const [winner, setWinner] = useState(null); // 'player' | 'ai' | null
+  const aiTimerRef = useRef(null);
 
   const isValid = (board, row, col, num) => {
     for (let i = 0; i < 9; i++) {
@@ -26,7 +31,15 @@ const Sudoku = () => {
     return true;
   };
 
-  const generateSudoku = (diffKey) => {
+  const stopAiTimer = () => {
+    if (aiTimerRef.current) {
+      clearInterval(aiTimerRef.current);
+      aiTimerRef.current = null;
+    }
+  };
+
+  const generateSudoku = (diffKey, nextMode) => {
+    stopAiTimer();
     const activeDiff = DIFFICULTIES.find(d => d.key === diffKey) || DIFFICULTIES.find(d => d.key === difficulty);
     const newBoard = Array(9).fill(null).map(() => Array(9).fill(0));
     const solve = (board) => {
@@ -49,6 +62,7 @@ const Sudoku = () => {
     };
 
     solve(newBoard);
+    const solution = newBoard.map(row => [...row]);
     const puzzle = newBoard.map(row => [...row]);
     let removed = 0;
     while (removed < activeDiff.removed) {
@@ -61,29 +75,64 @@ const Sudoku = () => {
     }
 
     setInitialGrid(puzzle.map(row => [...row]));
+    setSolutionGrid(solution);
     setGrid(puzzle.map(row => [...row]));
     setErrors([]);
     setSelectedCell(null);
     setLastFilled(null);
+    setAiProgress(0);
+    setWinner(null);
+    if (nextMode) setMode(nextMode);
   };
 
   useEffect(() => {
-    generateSudoku(difficulty);
-    // difficulty is only read on mount; subsequent changes go through handleDifficultyChange
-  }, []); // eslint-disable-line
+    generateSudoku(difficulty, 'libera');
+    return stopAiTimer;
+    // eslint-disable-next-line
+  }, []);
+
+  // AI race timer: only ticks in 'sfida' mode while nobody has won yet
+  useEffect(() => {
+    stopAiTimer();
+    if (mode !== 'sfida' || winner || initialGrid.length === 0) return undefined;
+
+    const totalEmpty = initialGrid.flat().filter(v => v === 0).length || 1;
+    const diff = DIFFICULTIES.find(d => d.key === difficulty);
+    const step = 100 / totalEmpty;
+
+    aiTimerRef.current = setInterval(() => {
+      setAiProgress(prev => {
+        const next = Math.min(100, prev + step);
+        if (next >= 100) {
+          stopAiTimer();
+          setWinner(w => w || 'ai');
+        }
+        return next;
+      });
+    }, diff.aiIntervalMs);
+
+    return stopAiTimer;
+    // eslint-disable-next-line
+  }, [mode, difficulty, initialGrid, winner]);
 
   const handleDifficultyChange = (key) => {
     setDifficulty(key);
     generateSudoku(key);
   };
 
+  const handleModeChange = (nextMode) => {
+    generateSudoku(difficulty, nextMode);
+  };
+
   const handleCellClick = (row, col) => {
+    if (winner) return;
     if (initialGrid[row][col] === 0) {
       setSelectedCell({ row, col });
     }
   };
 
   const handleNumberInput = (num) => {
+    if (winner) return;
     if (selectedCell && initialGrid[selectedCell.row][selectedCell.col] === 0) {
       const newGrid = grid.map((row, rIndex) =>
         row.map((colValue, cIndex) =>
@@ -93,6 +142,14 @@ const Sudoku = () => {
       setGrid(newGrid);
       checkErrors(newGrid);
       setLastFilled({ row: selectedCell.row, col: selectedCell.col });
+
+      if (mode === 'sfida' && solutionGrid.length) {
+        const solved = newGrid.every((row, r) => row.every((v, c) => v === solutionGrid[r][c]));
+        if (solved) {
+          stopAiTimer();
+          setWinner('player');
+        }
+      }
     }
   };
 
@@ -119,8 +176,29 @@ const Sudoku = () => {
     setErrors(newErrors);
   };
 
+  const playerProgress = (() => {
+    if (!solutionGrid.length || !initialGrid.length) return 0;
+    let total = 0, correct = 0;
+    initialGrid.forEach((row, r) => row.forEach((v, c) => {
+      if (v === 0) {
+        total++;
+        if (grid[r]?.[c] === solutionGrid[r][c]) correct++;
+      }
+    }));
+    return total ? (correct / total) * 100 : 0;
+  })();
+
   return (
     <div className="sudoku">
+      <div className="mode-picker">
+        <button className={`mode-pill ${mode === 'libera' ? 'active' : ''}`} onClick={() => handleModeChange('libera')}>
+          Libera
+        </button>
+        <button className={`mode-pill ${mode === 'sfida' ? 'active' : ''}`} onClick={() => handleModeChange('sfida')}>
+          Sfida vs Computer
+        </button>
+      </div>
+
       <div className="difficulty-picker">
         {DIFFICULTIES.map(d => (
           <button
@@ -132,6 +210,30 @@ const Sudoku = () => {
           </button>
         ))}
       </div>
+
+      {mode === 'sfida' && (
+        <>
+          {winner && (
+            <div className={`duel-result ${winner === 'player' ? 'win' : 'lose'}`}>
+              {winner === 'player' ? 'Hai vinto tu! 🎉' : 'Ha vinto il computer! 🤖'}
+            </div>
+          )}
+          <div className="duel-bars">
+            <div className="duel-bar-row">
+              <span className="duel-bar-label">Tu</span>
+              <div className="duel-bar-track">
+                <div className="duel-bar-fill player" style={{ width: `${playerProgress}%` }} />
+              </div>
+            </div>
+            <div className="duel-bar-row">
+              <span className="duel-bar-label">Computer</span>
+              <div className="duel-bar-track">
+                <div className="duel-bar-fill ai" style={{ width: `${aiProgress}%` }} />
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       <div className="sudoku-board">
         {grid.map((row, rowIndex) => (

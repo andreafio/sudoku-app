@@ -195,7 +195,108 @@ body {
   transform: translateY(0);
 }
 
+/* ---- Shared difficulty & mode pills ---- */
+
+.difficulty-picker,
+.mode-picker {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.difficulty-pill,
+.mode-pill {
+  border: 2px solid transparent;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease, color 0.12s ease;
+}
+
+.difficulty-pill:hover,
+.mode-pill:hover {
+  transform: translateY(-2px);
+}
+
+.difficulty-facile { color: var(--diff-facile); box-shadow: inset 0 0 0 2px var(--diff-facile); }
+.difficulty-medio { color: var(--diff-medio); box-shadow: inset 0 0 0 2px var(--diff-medio); }
+.difficulty-difficile { color: var(--diff-difficile); box-shadow: inset 0 0 0 2px var(--diff-difficile); }
+.difficulty-esperto { color: var(--diff-esperto); box-shadow: inset 0 0 0 2px var(--diff-esperto); }
+
+.difficulty-pill.active.difficulty-facile { background: var(--diff-facile); color: #fff; box-shadow: 0 4px 14px rgba(34, 197, 94, 0.55); }
+.difficulty-pill.active.difficulty-medio { background: var(--diff-medio); color: #fff; box-shadow: 0 4px 14px rgba(59, 130, 246, 0.55); }
+.difficulty-pill.active.difficulty-difficile { background: var(--diff-difficile); color: #fff; box-shadow: 0 4px 14px rgba(249, 115, 22, 0.55); }
+.difficulty-pill.active.difficulty-esperto { background: var(--diff-esperto); color: #fff; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.55); }
+
+.mode-pill { color: var(--diff-medio); box-shadow: inset 0 0 0 2px var(--diff-medio); }
+.mode-pill.active { background: var(--diff-medio); color: #fff; box-shadow: 0 4px 14px rgba(59, 130, 246, 0.55); }
+
+/* ---- Shared duel/progress UI ---- */
+
+.duel-bars {
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.duel-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.duel-bar-label {
+  width: 64px;
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.duel-bar-track {
+  flex: 1;
+  height: 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.35);
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.duel-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.25s ease;
+}
+
+.duel-bar-fill.player { background: linear-gradient(90deg, var(--d7), var(--d8)); }
+.duel-bar-fill.ai { background: linear-gradient(90deg, var(--d1), var(--d2)); }
+
+.duel-result {
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  margin-bottom: 14px;
+}
+
+.duel-result.win { background: var(--diff-facile); }
+.duel-result.lose { background: var(--diff-esperto); }
+
 @media (prefers-reduced-motion: reduce) {
   body { animation: none; }
-  .game-card, .back-btn, .reset-btn { transition: none; }
+  .game-card, .back-btn, .reset-btn, .difficulty-pill, .mode-pill, .duel-bar-fill { transition: none; }
 }

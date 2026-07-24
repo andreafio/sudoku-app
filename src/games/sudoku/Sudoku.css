@@ -4,39 +4,6 @@
   align-items: center;
 }
 
-.difficulty-picker {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.difficulty-pill {
-  border: 2px solid transparent;
-  background: rgba(255, 255, 255, 0.85);
-  padding: 8px 16px;
-  border-radius: 999px;
-  font-weight: 700;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease, color 0.12s ease;
-}
-
-.difficulty-pill:hover {
-  transform: translateY(-2px);
-}
-
-.difficulty-facile { color: var(--diff-facile); box-shadow: inset 0 0 0 2px var(--diff-facile); }
-.difficulty-medio { color: var(--diff-medio); box-shadow: inset 0 0 0 2px var(--diff-medio); }
-.difficulty-difficile { color: var(--diff-difficile); box-shadow: inset 0 0 0 2px var(--diff-difficile); }
-.difficulty-esperto { color: var(--diff-esperto); box-shadow: inset 0 0 0 2px var(--diff-esperto); }
-
-.difficulty-pill.active.difficulty-facile { background: var(--diff-facile); color: #fff; box-shadow: 0 4px 14px rgba(34, 197, 94, 0.55); }
-.difficulty-pill.active.difficulty-medio { background: var(--diff-medio); color: #fff; box-shadow: 0 4px 14px rgba(59, 130, 246, 0.55); }
-.difficulty-pill.active.difficulty-difficile { background: var(--diff-difficile); color: #fff; box-shadow: 0 4px 14px rgba(249, 115, 22, 0.55); }
-.difficulty-pill.active.difficulty-esperto { background: var(--diff-esperto); color: #fff; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.55); }
-
 .sudoku-board {
   background: #fff;
   border-radius: 16px;

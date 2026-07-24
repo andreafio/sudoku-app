@@ -7,6 +7,12 @@ const LINES = [
   [0, 4, 8], [2, 4, 6],
 ];
 
+const DIFFICULTIES = [
+  { key: 'facile', label: 'Facile' },
+  { key: 'medio', label: 'Medio' },
+  { key: 'esperto', label: 'Esperto' },
+];
+
 const getWinner = (cells) => {
   for (const [a, b, c] of LINES) {
     if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) {
@@ -16,10 +22,16 @@ const getWinner = (cells) => {
   return null;
 };
 
-const cpuChoice = (cells) => {
+// random legal move
+const randomChoice = (cells) => {
+  const free = cells.map((v, i) => (v ? null : i)).filter(i => i !== null);
+  return free.length ? free[Math.floor(Math.random() * free.length)] : null;
+};
+
+// win if possible, otherwise block, otherwise center/corner/random
+const heuristicChoice = (cells) => {
   const free = cells.map((v, i) => (v ? null : i)).filter(i => i !== null);
   if (free.length === 0) return null;
-  // win if possible, otherwise block the opponent
   for (const mark of ['O', 'X']) {
     for (const i of free) {
       const test = [...cells];
@@ -33,10 +45,42 @@ const cpuChoice = (cells) => {
   return free[Math.floor(Math.random() * free.length)];
 };
 
+// perfect play via minimax
+const minimax = (cells, mark) => {
+  const winner = getWinner(cells);
+  if (winner) return { score: winner.player === 'O' ? 10 : -10 };
+  if (cells.every(Boolean)) return { score: 0 };
+
+  const free = cells.map((v, i) => (v ? null : i)).filter(i => i !== null);
+  const results = free.map(i => {
+    const next = [...cells];
+    next[i] = mark;
+    const { score } = minimax(next, mark === 'O' ? 'X' : 'O');
+    return { i, score };
+  });
+
+  return mark === 'O'
+    ? results.reduce((best, r) => (r.score > best.score ? r : best))
+    : results.reduce((best, r) => (r.score < best.score ? r : best));
+};
+
+const minimaxChoice = (cells) => {
+  if (cells.every(v => !v)) return 4; // fast-path: start in the center
+  const { i } = minimax(cells, 'O');
+  return i;
+};
+
+const cpuChoiceFor = (level, cells) => {
+  if (level === 'facile') return randomChoice(cells);
+  if (level === 'esperto') return minimaxChoice(cells);
+  return heuristicChoice(cells);
+};
+
 const Tris = () => {
   const [cells, setCells] = useState(Array(9).fill(null));
   const [xIsNext, setXIsNext] = useState(true);
   const [mode, setMode] = useState('cpu');
+  const [level, setLevel] = useState('medio');
 
   const winner = getWinner(cells);
   const isDraw = !winner && cells.every(Boolean);
@@ -47,7 +91,7 @@ const Tris = () => {
     const timer = setTimeout(() => {
       setCells(prev => {
         if (getWinner(prev) || prev.every(Boolean)) return prev;
-        const i = cpuChoice(prev);
+        const i = cpuChoiceFor(level, prev);
         if (i === null) return prev;
         const next = [...prev];
         next[i] = 'O';
@@ -56,12 +100,13 @@ const Tris = () => {
       setXIsNext(true);
     }, 400);
     return () => clearTimeout(timer);
-  }, [cpuTurn]);
+  }, [cpuTurn, level]);
 
-  const newGame = (nextMode = mode) => {
+  const newGame = (nextMode = mode, nextLevel = level) => {
     setCells(Array(9).fill(null));
     setXIsNext(true);
     setMode(nextMode);
+    setLevel(nextLevel);
   };
 
   const handleClick = (i) => {
@@ -80,20 +125,34 @@ const Tris = () => {
 
   return (
     <div className="tris">
-      <div className="tris-modes">
+      <div className="mode-picker">
         <button
-          className={`tris-mode ${mode === 'cpu' ? 'active' : ''}`}
+          className={`mode-pill ${mode === 'cpu' ? 'active' : ''}`}
           onClick={() => newGame('cpu')}
         >
           vs Computer
         </button>
         <button
-          className={`tris-mode ${mode === 'pvp' ? 'active' : ''}`}
+          className={`mode-pill ${mode === 'pvp' ? 'active' : ''}`}
           onClick={() => newGame('pvp')}
         >
           2 Giocatori
         </button>
       </div>
+
+      {mode === 'cpu' && (
+        <div className="difficulty-picker">
+          {DIFFICULTIES.map(d => (
+            <button
+              key={d.key}
+              className={`difficulty-pill difficulty-${d.key} ${level === d.key ? 'active' : ''}`}
+              onClick={() => newGame('cpu', d.key)}
+            >
+              {d.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className={`tris-status ${winner ? 'won' : ''}`}>{status}</div>
 
