@@ -61,9 +61,23 @@
   gap: 8px;
 }
 
+.g2048-duel {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.g2048-board-mini {
+  transform: scale(0.55);
+  transform-origin: top center;
+  margin: -20px -30px;
+}
+
 .g2048-tile {
-  width: min(16vw, 72px);
-  height: min(16vw, 72px);
+  width: min(calc(78vw / var(--cols, 4)), 72px);
+  height: min(calc(78vw / var(--cols, 4)), 72px);
   border-radius: 10px;
   display: flex;
   align-items: center;

@@ -1,9 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './Game2048.css';
 
-const SIZE = 4;
+const DIFFICULTIES = [
+  { key: 'facile', label: 'Facile', size: 5 },
+  { key: 'medio', label: 'Medio', size: 4 },
+  { key: 'difficile', label: 'Difficile', size: 3 },
+];
 
-const emptyBoard = () => Array(SIZE).fill(null).map(() => Array(SIZE).fill(0));
+const emptyBoard = (size) => Array(size).fill(null).map(() => Array(size).fill(0));
 
 const addRandomTile = (board) => {
   const empty = [];
@@ -27,7 +31,7 @@ const slideRowLeft = (row) => {
       out.push(vals[i]);
     }
   }
-  while (out.length < SIZE) out.push(0);
+  while (out.length < row.length) out.push(0);
   return [out, gained];
 };
 
@@ -53,34 +57,104 @@ const moveBoard = (board, dir) => {
 };
 
 const canMove = (b) => {
-  for (let r = 0; r < SIZE; r++) {
-    for (let c = 0; c < SIZE; c++) {
+  const size = b.length;
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
       if (b[r][c] === 0) return true;
-      if (c + 1 < SIZE && b[r][c] === b[r][c + 1]) return true;
-      if (r + 1 < SIZE && b[r][c] === b[r + 1][c]) return true;
+      if (c + 1 < size && b[r][c] === b[r][c + 1]) return true;
+      if (r + 1 < size && b[r][c] === b[r + 1][c]) return true;
     }
   }
   return false;
 };
 
-const newGameState = () => ({
-  board: addRandomTile(addRandomTile(emptyBoard())),
+const hasReached2048 = (b) => b.some(row => row.some(v => v >= 2048));
+
+// AI: try all 4 directions, play whichever gains the most (ties broken randomly)
+const bestAiMove = (board) => {
+  const dirs = ['left', 'right', 'up', 'down'];
+  const options = dirs
+    .map(dir => ({ dir, result: moveBoard(board, dir) }))
+    .filter(o => o.result[2]);
+  if (options.length === 0) return null;
+  const maxGain = Math.max(...options.map(o => o.result[1]));
+  const best = options.filter(o => o.result[1] === maxGain);
+  return best[Math.floor(Math.random() * best.length)].result[0];
+};
+
+const newSolo = (size) => ({
+  board: addRandomTile(addRandomTile(emptyBoard(size))),
   score: 0,
   over: false,
 });
 
 const Game2048 = () => {
-  const [state, setState] = useState(newGameState);
+  const [difficulty, setDifficulty] = useState('medio');
+  const [mode, setMode] = useState('solitario');
+  const [player, setPlayer] = useState(() => newSolo(4));
+  const [ai, setAi] = useState(() => newSolo(4));
+  const [winner, setWinner] = useState(null); // 'player' | 'ai' | 'draw' | null
+
+  const winnerRef = useRef(null);
+  const aiOverRef = useRef(false);
+  useEffect(() => { winnerRef.current = winner; }, [winner]);
+  useEffect(() => { aiOverRef.current = ai.over; }, [ai.over]);
+
+  const size = DIFFICULTIES.find(d => d.key === difficulty).size;
+
+  const startGame = useCallback((diffKey = difficulty, nextMode = mode) => {
+    const nextSize = DIFFICULTIES.find(d => d.key === diffKey).size;
+    setDifficulty(diffKey);
+    setMode(nextMode);
+    setPlayer(newSolo(nextSize));
+    setAi(newSolo(nextSize));
+    setWinner(null);
+  }, [difficulty, mode]);
 
   const doMove = useCallback((dir) => {
-    setState(s => {
-      if (s.over) return s;
+    setPlayer(s => {
+      if (s.over || winnerRef.current) return s;
       const [board, gained, moved] = moveBoard(s.board, dir);
       if (!moved) return s;
       addRandomTile(board);
       return { board, score: s.score + gained, over: !canMove(board) };
     });
   }, []);
+
+  useEffect(() => {
+    if (hasReached2048(player.board) && !winnerRef.current) setWinner('player');
+  }, [player.board]);
+
+  useEffect(() => {
+    if (hasReached2048(ai.board) && !winnerRef.current) setWinner('ai');
+  }, [ai.board]);
+
+  // AI opponent ticking, only in 'sfida' mode
+  useEffect(() => {
+    if (mode !== 'sfida') return undefined;
+    const timer = setInterval(() => {
+      if (winnerRef.current || aiOverRef.current) return;
+      setAi(s => {
+        if (s.over) return s;
+        const board = bestAiMove(s.board);
+        if (!board) return { ...s, over: true };
+        addRandomTile(board);
+        const gained = board.flat().reduce((a, b) => a + b, 0) - s.board.flat().reduce((a, b) => a + b, 0);
+        const score = s.score + Math.max(0, gained);
+        return { board, score, over: !canMove(board) };
+      });
+    }, 550);
+    return () => clearInterval(timer);
+  }, [mode, difficulty]);
+
+  // Decide a duel winner once both boards are stuck, by score
+  useEffect(() => {
+    if (mode !== 'sfida' || winner) return;
+    if (player.over && ai.over) {
+      if (player.score === ai.score) setWinner('draw');
+      else setWinner(player.score > ai.score ? 'player' : 'ai');
+    }
+  }, [mode, player.over, ai.over, player.score, ai.score, winner]);
 
   useEffect(() => {
     const KEYS = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' };
@@ -94,26 +168,60 @@ const Game2048 = () => {
     return () => window.removeEventListener('keydown', onKey);
   }, [doMove]);
 
-  const won = state.board.some(row => row.some(v => v >= 2048));
+  const renderBoard = (board, extraClass) => (
+    <div className={`g2048-board ${extraClass || ''}`} style={{ '--cols': board.length }}>
+      {board.map((row, r) => (
+        <div key={r} className="g2048-row">
+          {row.map((v, c) => (
+            <div key={c} className="g2048-tile" data-value={v || undefined}>
+              {v !== 0 ? v : ''}
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <div className="g2048">
-      <div className="g2048-topbar">
-        <div className="g2048-score">Punteggio<strong>{state.score}</strong></div>
-        {state.over && <div className="g2048-badge g2048-lost">Nessuna mossa!</div>}
-        {!state.over && won && <div className="g2048-badge g2048-won">2048! 🎉</div>}
+      <div className="mode-picker">
+        <button className={`mode-pill ${mode === 'solitario' ? 'active' : ''}`} onClick={() => startGame(difficulty, 'solitario')}>
+          Solitario
+        </button>
+        <button className={`mode-pill ${mode === 'sfida' ? 'active' : ''}`} onClick={() => startGame(difficulty, 'sfida')}>
+          Sfida vs Computer
+        </button>
       </div>
 
-      <div className="g2048-board">
-        {state.board.map((row, r) => (
-          <div key={r} className="g2048-row">
-            {row.map((v, c) => (
-              <div key={c} className="g2048-tile" data-value={v || undefined}>
-                {v !== 0 ? v : ''}
-              </div>
-            ))}
-          </div>
+      <div className="difficulty-picker">
+        {DIFFICULTIES.map(d => (
+          <button
+            key={d.key}
+            className={`difficulty-pill difficulty-${d.key} ${difficulty === d.key ? 'active' : ''}`}
+            onClick={() => startGame(d.key, mode)}
+          >
+            {d.label}
+          </button>
         ))}
+      </div>
+
+      {winner && (
+        <div className={`duel-result ${winner === 'player' ? 'win' : winner === 'draw' ? '' : 'lose'}`}>
+          {winner === 'player' && 'Hai vinto tu! 🎉'}
+          {winner === 'ai' && 'Ha vinto il computer! 🤖'}
+          {winner === 'draw' && 'Pareggio!'}
+        </div>
+      )}
+
+      <div className="g2048-topbar">
+        <div className="g2048-score">Punteggio<strong>{player.score}</strong></div>
+        {mode === 'sfida' && <div className="g2048-score">Computer<strong>{ai.score}</strong></div>}
+        {mode === 'solitario' && player.over && <div className="g2048-badge g2048-lost">Nessuna mossa!</div>}
+      </div>
+
+      <div className={mode === 'sfida' ? 'g2048-duel' : ''}>
+        {renderBoard(player.board)}
+        {mode === 'sfida' && renderBoard(ai.board, 'g2048-board-mini')}
       </div>
 
       <div className="g2048-controls">
@@ -125,8 +233,8 @@ const Game2048 = () => {
         </div>
       </div>
 
-      <button className="reset-btn" onClick={() => setState(newGameState())}>Nuova Partita</button>
-      <p className="g2048-hint">Usa le frecce della tastiera o i pulsanti</p>
+      <button className="reset-btn" onClick={() => startGame(difficulty, mode)}>Nuova Partita</button>
+      <p className="g2048-hint">Usa le frecce della tastiera o i pulsanti · griglia {size}x{size}</p>
     </div>
   );
 };
