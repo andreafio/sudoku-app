@@ -9,12 +9,12 @@ import WordGuess from './games/wordguess/WordGuess';
 import Crossword from './games/crossword/Crossword';
 
 const GAMES = [
-  { key: 'sudoku', title: 'Sudoku', emoji: '🧩', desc: 'Il classico 9x9 con 4 difficoltà', accent: 'sudoku', Component: Sudoku },
-  { key: '2048', title: '2048', emoji: '🔢', desc: 'Unisci le tessere fino a 2048', accent: 'g2048', Component: Game2048 },
-  { key: 'memory', title: 'Memory', emoji: '🃏', desc: 'Trova tutte le coppie', accent: 'memory', Component: Memory },
-  { key: 'tris', title: 'Tris', emoji: '⭕', desc: 'Tre in fila, anche contro il computer', accent: 'tris', Component: Tris },
-  { key: 'wordguess', title: 'Indovina la Parola', emoji: '🔤', desc: 'Wordle in italiano, 6 tentativi', accent: 'wordguess', Component: WordGuess },
-  { key: 'crossword', title: 'Cruciverba', emoji: '📰', desc: 'Griglia generata al volo con indizi', accent: 'crossword', Component: Crossword },
+  { key: 'sudoku', title: 'Sudoku', emoji: '🧩', desc: 'Il classico 9x9 con 4 difficoltà', accent: 'sudoku', Component: Sudoku, hint: 'Tocca una cella libera, poi un numero' },
+  { key: '2048', title: '2048', emoji: '🔢', desc: 'Unisci le tessere fino a 2048', accent: 'g2048', Component: Game2048, hint: 'Scorri sulla griglia per muovere le tessere' },
+  { key: 'memory', title: 'Memory', emoji: '🃏', desc: 'Trova tutte le coppie', accent: 'memory', Component: Memory, hint: 'Tocca due carte per volta e trova le coppie' },
+  { key: 'tris', title: 'Tris', emoji: '⭕', desc: 'Tre in fila, anche contro il computer', accent: 'tris', Component: Tris, hint: 'Tocca una casella libera per giocare' },
+  { key: 'wordguess', title: 'Indovina la Parola', emoji: '🔤', desc: 'Wordle in italiano, 6 tentativi', accent: 'wordguess', Component: WordGuess, hint: 'Scrivi con la tastiera e premi INVIO' },
+  { key: 'crossword', title: 'Cruciverba', emoji: '📰', desc: 'Griglia generata al volo con indizi', accent: 'crossword', Component: Crossword, hint: 'Tocca una casella e scrivi con la tastiera' },
 ];
 
 const App = () => {
@@ -25,7 +25,7 @@ const App = () => {
     const Game = active.Component;
     return (
       <div className="App">
-        <GameShell title={active.title} onBack={() => setActiveKey(null)}>
+        <GameShell title={active.title} hint={active.hint} onBack={() => setActiveKey(null)}>
           <Game />
         </GameShell>
       </div>

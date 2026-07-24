@@ -168,6 +168,14 @@ body {
   box-shadow: 0 5px 14px rgba(0, 0, 0, 0.25);
 }
 
+.game-shell-hint {
+  margin: 0 0 18px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+}
+
 /* ---- Shared buttons ---- */
 
 .reset-btn {
@@ -206,6 +214,20 @@ body {
   margin-bottom: 16px;
   flex-wrap: wrap;
   justify-content: center;
+}
+
+@media (max-width: 420px) {
+  .difficulty-picker,
+  .mode-picker {
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .difficulty-pill,
+  .mode-pill {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+  }
 }
 
 .difficulty-pill,
