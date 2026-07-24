@@ -45,7 +45,7 @@
 
 .memory-grid {
   display: grid;
-  grid-template-columns: repeat(4, min(18vw, 78px));
+  grid-template-columns: repeat(var(--memory-cols, 4), min(18vw, 78px));
   gap: 10px;
 }
 

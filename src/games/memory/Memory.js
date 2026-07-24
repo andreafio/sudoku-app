@@ -4,10 +4,10 @@ import './Memory.css';
 const EMOJI_POOL = ['🐶', '🦊', '🐼', '🐸', '🦄', '🐙', '🦋', '🍉', '🍕', '⚽', '🎧', '🚀'];
 
 const DIFFICULTIES = [
-  { key: 'facile', label: 'Facile', pairs: 6, aiMemoryChance: 0.35 },
-  { key: 'medio', label: 'Medio', pairs: 8, aiMemoryChance: 0.6 },
-  { key: 'difficile', label: 'Difficile', pairs: 10, aiMemoryChance: 0.8 },
-  { key: 'esperto', label: 'Esperto', pairs: 12, aiMemoryChance: 1 },
+  { key: 'facile', label: 'Facile', pairs: 6, cols: 3, aiMemoryChance: 0.35 },
+  { key: 'medio', label: 'Medio', pairs: 8, cols: 4, aiMemoryChance: 0.6 },
+  { key: 'difficile', label: 'Difficile', pairs: 10, cols: 4, aiMemoryChance: 0.8 },
+  { key: 'esperto', label: 'Esperto', pairs: 12, cols: 4, aiMemoryChance: 1 },
 ];
 
 const buildDeck = (pairs) => {
@@ -227,7 +227,7 @@ const Memory = () => {
         )}
       </div>
 
-      <div className="memory-grid">
+      <div className="memory-grid" style={{ '--memory-cols': diffConf.cols }}>
         {deck.map(card => {
           const isUp = flipped.includes(card.id) || matched.has(card.id);
           return (
