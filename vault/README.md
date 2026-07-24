@@ -20,12 +20,13 @@ Ogni task vive in `tasks/` come file markdown con obiettivo, checklist e stato.
 | [T-011](tasks/T-011-memory-griglie.md) | Memory: griglie diverse per difficoltà | done |
 | [T-012](tasks/T-012-indovina-parola.md) | Gioco Indovina la Parola (Wordle) | done |
 | [T-013](tasks/T-013-cruciverba.md) | Gioco Cruciverba (generato proceduralmente) | done |
+| [T-014](tasks/T-014-usabilita-mobile.md) | Usabilità mobile: tastiera reale, swipe, meno affollamento | done |
 
 Stati possibili: `todo` → `in-progress` → `done`.
 
 ## Ordine di esecuzione
 
-T-001 → T-002/T-003 → T-004 → T-005/T-006/T-007 (indipendenti tra loro) → T-008 → T-009 → T-010 → T-011/T-012/T-013
+T-001 → T-002/T-003 → T-004 → T-005/T-006/T-007 (indipendenti tra loro) → T-008 → T-009 → T-010 → T-011/T-012/T-013 → T-014
 
 ## Riferimenti
 
