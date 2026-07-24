@@ -17,12 +17,15 @@ Ogni task vive in `tasks/` come file markdown con obiettivo, checklist e stato.
 | [T-008](tasks/T-008-verifica.md) | Verifica e rifiniture | done |
 | [T-009](tasks/T-009-difficolta-tutti.md) | Difficoltà per tutti i giochi | done |
 | [T-010](tasks/T-010-sfida-ai.md) | Modalità Sfida contro il Computer | done |
+| [T-011](tasks/T-011-memory-griglie.md) | Memory: griglie diverse per difficoltà | done |
+| [T-012](tasks/T-012-indovina-parola.md) | Gioco Indovina la Parola (Wordle) | done |
+| [T-013](tasks/T-013-cruciverba.md) | Gioco Cruciverba (generato proceduralmente) | done |
 
 Stati possibili: `todo` → `in-progress` → `done`.
 
 ## Ordine di esecuzione
 
-T-001 → T-002/T-003 → T-004 → T-005/T-006/T-007 (indipendenti tra loro) → T-008 → T-009 → T-010
+T-001 → T-002/T-003 → T-004 → T-005/T-006/T-007 (indipendenti tra loro) → T-008 → T-009 → T-010 → T-011/T-012/T-013
 
 ## Riferimenti
 

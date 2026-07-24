@@ -23,6 +23,20 @@ tavolo/puzzle, tutti senza dipendenze extra oltre React.
 
 - Smoke test browser su ogni gioco, screenshot, stati vault aggiornati (T-008)
 
+## Fase 4 — Difficoltà e AI per tutti i giochi (questa iterazione)
+
+- Difficoltà su ogni gioco: 2048 (dimensione griglia), Memory (numero coppie),
+  Tris (livello AI: casuale/euristica/minimax) (T-009)
+- Modalità Sfida vs Computer su Sudoku, 2048 e Memory, riusando i pattern
+  `.mode-pill`/`.duel-bars`/`.duel-result` (T-010)
+
+## Fase 5 — Memory a griglie diverse + due nuovi giochi (questa iterazione)
+
+- Memory con griglie rettangolari diverse per difficoltà (T-011)
+- Indovina la Parola: Wordle in italiano, 4 difficoltà, Sfida vs Computer (T-012)
+- Cruciverba generato proceduralmente da banca di parole/indizi, Sfida vs
+  Computer (T-013)
+
 ## Backlog (future iterazioni)
 
 - **Campo minato**: griglia con difficoltà, coerente con lo stile Sudoku
