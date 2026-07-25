@@ -370,7 +370,7 @@ const Crossword = () => {
       )}
 
       <div className="xw-layout">
-        <div className="xw-board">
+        <div className="xw-board" style={{ '--xw-cols': puzzle.cols }}>
           <input
             ref={inputRef}
             className="xw-input"
