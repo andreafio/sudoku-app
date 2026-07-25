@@ -4,7 +4,18 @@
   align-items: center;
 }
 
+.sudoku-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: none;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .sudoku-board {
+  position: relative;
   background: #fff;
   border-radius: 16px;
   padding: 12px;
@@ -17,9 +28,11 @@
   display: flex;
 }
 
+/* 62px = padding di .App (32) + padding della board (24) + bordo della board (6).
+   Senza sottrarli, 9 celle da 11vw sfondano sempre lo schermo. */
 .cell {
-  width: min(11vw, 44px);
-  height: min(11vw, 44px);
+  width: min(calc((100vw - 62px) / 9), 44px);
+  height: min(calc((100vw - 62px) / 9), 44px);
   border: 1px solid var(--cell-line);
   display: flex;
   align-items: center;
@@ -89,44 +102,6 @@
   50% { transform: translateX(3px); }
   75% { transform: translateX(-3px); }
   100% { transform: translateX(0); }
-}
-
-.number-pad {
-  margin-top: 22px;
-  display: grid;
-  grid-template-columns: repeat(9, min(8vw, 40px));
-  gap: 8px;
-}
-
-.number-pad button {
-  padding: 10px 0;
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #1e293b;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
-}
-
-.number-pad button[data-value="1"] { background: var(--d1); }
-.number-pad button[data-value="2"] { background: var(--d2); }
-.number-pad button[data-value="3"] { background: var(--d3); }
-.number-pad button[data-value="4"] { background: var(--d4); }
-.number-pad button[data-value="5"] { background: var(--d5); }
-.number-pad button[data-value="6"] { background: var(--d6); }
-.number-pad button[data-value="7"] { background: var(--d7); }
-.number-pad button[data-value="8"] { background: var(--d8); }
-.number-pad button[data-value="9"] { background: var(--d9); }
-
-.number-pad button:hover {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
-}
-
-.number-pad button:active {
-  transform: scale(0.9);
 }
 
 @media (prefers-reduced-motion: reduce) {

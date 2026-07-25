@@ -9,7 +9,7 @@ import WordGuess from './games/wordguess/WordGuess';
 import Crossword from './games/crossword/Crossword';
 
 const GAMES = [
-  { key: 'sudoku', title: 'Sudoku', emoji: '🧩', desc: 'Il classico 9x9 con 4 difficoltà', accent: 'sudoku', Component: Sudoku, hint: 'Tocca una cella libera, poi un numero' },
+  { key: 'sudoku', title: 'Sudoku', emoji: '🧩', desc: 'Il classico 9x9 con 4 difficoltà', accent: 'sudoku', Component: Sudoku, hint: 'Tocca una cella e digita il numero · 0 per cancellare' },
   { key: '2048', title: '2048', emoji: '🔢', desc: 'Unisci le tessere fino a 2048', accent: 'g2048', Component: Game2048, hint: 'Scorri sulla griglia per muovere le tessere' },
   { key: 'memory', title: 'Memory', emoji: '🃏', desc: 'Trova tutte le coppie', accent: 'memory', Component: Memory, hint: 'Tocca due carte per volta e trova le coppie' },
   { key: 'tris', title: 'Tris', emoji: '⭕', desc: 'Tre in fila, anche contro il computer', accent: 'tris', Component: Tris, hint: 'Tocca una casella libera per giocare' },

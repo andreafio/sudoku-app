@@ -20,6 +20,7 @@ const Sudoku = () => {
   const [aiProgress, setAiProgress] = useState(0);
   const [winner, setWinner] = useState(null); // 'player' | 'ai' | null
   const aiTimerRef = useRef(null);
+  const inputRef = useRef(null);
 
   const isValid = (board, row, col, num) => {
     for (let i = 0; i < 9; i++) {
@@ -128,9 +129,11 @@ const Sudoku = () => {
     if (winner) return;
     if (initialGrid[row][col] === 0) {
       setSelectedCell({ row, col });
+      inputRef.current?.focus();
     }
   };
 
+  // num === 0 clears the cell
   const handleNumberInput = (num) => {
     if (winner) return;
     if (selectedCell && initialGrid[selectedCell.row][selectedCell.col] === 0) {
@@ -141,7 +144,7 @@ const Sudoku = () => {
       );
       setGrid(newGrid);
       checkErrors(newGrid);
-      setLastFilled({ row: selectedCell.row, col: selectedCell.col });
+      if (num !== 0) setLastFilled({ row: selectedCell.row, col: selectedCell.col });
 
       if (mode === 'sfida' && solutionGrid.length) {
         const solved = newGrid.every((row, r) => row.every((v, c) => v === solutionGrid[r][c]));
@@ -151,6 +154,34 @@ const Sudoku = () => {
         }
       }
     }
+  };
+
+  // Digits arrive through the hidden input's onChange, which is what mobile numeric
+  // keypads actually fire; Backspace/Delete and arrows are handled on keydown.
+  const handleInputChange = (e) => {
+    const val = e.target.value;
+    e.target.value = '';
+    const digit = val.slice(-1);
+    if (/^[1-9]$/.test(digit)) handleNumberInput(Number(digit));
+    else if (digit === '0') handleNumberInput(0);
+  };
+
+  const moveSelection = (dRow, dCol) => {
+    if (!selectedCell) return;
+    const row = Math.min(8, Math.max(0, selectedCell.row + dRow));
+    const col = Math.min(8, Math.max(0, selectedCell.col + dCol));
+    if (initialGrid[row][col] === 0) setSelectedCell({ row, col });
+  };
+
+  const handleInputKeyDown = (e) => {
+    if (winner) return;
+    if (e.key === 'Backspace' || e.key === 'Delete') {
+      e.preventDefault();
+      handleNumberInput(0);
+    } else if (e.key === 'ArrowUp') { e.preventDefault(); moveSelection(-1, 0); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); moveSelection(1, 0); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); moveSelection(0, -1); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); moveSelection(0, 1); }
   };
 
   const checkErrors = (currentGrid) => {
@@ -236,6 +267,19 @@ const Sudoku = () => {
       )}
 
       <div className="sudoku-board">
+        <input
+          ref={inputRef}
+          className="sudoku-input"
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          autoCorrect="off"
+          autoComplete="off"
+          spellCheck="false"
+          onChange={handleInputChange}
+          onKeyDown={handleInputKeyDown}
+          aria-label="Scrivi il numero della cella selezionata"
+        />
         {grid.map((row, rowIndex) => (
           <div key={rowIndex} className="row">
             {row.map((cell, colIndex) => {
@@ -261,13 +305,6 @@ const Sudoku = () => {
         ))}
       </div>
 
-      <div className="number-pad">
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
-          <button key={num} data-value={num} onClick={() => handleNumberInput(num)}>
-            {num}
-          </button>
-        ))}
-      </div>
       <button className="reset-btn" onClick={() => generateSudoku(difficulty)}>Nuovo Puzzle</button>
     </div>
   );
